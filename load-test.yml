@@ -1,0 +1,37 @@
+config:
+  target: "SEU_TARGET"
+  phases:
+    - duration: 900
+      arrivalRate: 500
+      name: "Escalando"
+    # - duration: 60
+    #   arrivalRate: 1
+    #   name: "Escalando"
+    # - duration: 5000
+    #   arrivalRate: 1
+    #   name: "Sentando o aço"
+  processor: "./gerador_tarefas.js"
+scenarios:
+  - name: "CRUD BIA"
+    flow:
+      - get:
+          url: "/api/tarefas"
+      - post:
+          url: "/api/tarefas"
+          beforeRequest: gerarTarefa
+          json:
+            dia: "{{ dia }}"
+            importante: "{{ importante }}"
+            titulo: "{{ titulo }}"
+          capture:
+            - json: "$.uuid"
+              as: "id"
+      - put:
+          url: "/api/tarefas/update_priority/{{ id }}"
+          json:
+            uuid: "{{ id }}"
+            dia: "{{ dia }}"
+            importante: "{{ importante }}"
+            titulo: "{{ titulo }}"
+      - delete:
+          url: "/api/tarefas/{{ id }}"
